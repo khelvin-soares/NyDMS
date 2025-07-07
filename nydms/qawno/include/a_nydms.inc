@@ -81,7 +81,7 @@ Te vejo por lá! 📱✨
 
 | - +=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+ - |
 
-               NyDMS 1.0.0
+               NyDMS 1.0.1
 © Copyright 2025 by Kelvin (Nyvlehk) Soares.
 
 @author    : Nyvlehk (https://khelvinzito.vercel.app/)
@@ -165,7 +165,7 @@ function NyDMS_Start() {
     printf("| +=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+ |");
     printf("                                           ");
     printf("                  Nyvlehk                  ");
-    printf("               Version 1.0.0               ");
+    printf("               Version 1.0.1               ");
     printf("                01/Jul/2025                ");
     printf("      https://khelvinzito.vercel.app/      ");
     printf("  Thank you for choosing to use NyDMS. :)  ");
@@ -179,7 +179,7 @@ function NyDMS_Start() {
 }
 
 stock NyDMS_CreateFile(const Filename[]) {
-    if(!SystemCheckDefinedCommand(CheckDefinedCommand)) { return false; }
+    if(!SystemCheckDefinedCommand(CheckDefinedCommand)) { return true; }
     return SystemCreateFile(Filename);
 }
 NyDMS SystemCreateFile(const File[]) {
@@ -197,7 +197,7 @@ NyDMS SystemCreateFile(const File[]) {
 }
 
 stock NyDMS_RemoveFile(const Filename[]) {
-    if(!SystemCheckDefinedCommand(CheckDefinedCommand)) { return false; }
+    if(!SystemCheckDefinedCommand(CheckDefinedCommand)) { return true; }
     return SystemRemoveFile(Filename);
 }
 NyDMS SystemRemoveFile(const File[]) {
@@ -205,7 +205,7 @@ NyDMS SystemRemoveFile(const File[]) {
 }
 
 stock NyDMS_FileExists(const Filename[]) {
-    if(!SystemCheckDefinedCommand(CheckDefinedCommand)) { return false; }
+    if(!SystemCheckDefinedCommand(CheckDefinedCommand)) { return true; }
     return SystemFileExists(Filename);
 }
 NyDMS SystemFileExists(const File[]) {
@@ -215,7 +215,7 @@ NyDMS SystemFileExists(const File[]) {
 
 
 stock NyDMS_SetString(const Filename[], const Key[], const Value[]) {
-    if(!SystemCheckDefinedCommand(CheckDefinedCommand)) { return false; }
+    if(!SystemCheckDefinedCommand(CheckDefinedCommand)) { return true; }
     return SystemSetString(Filename, Key, Value);
 }
 NyDMS SystemSetString(const File[], const SystemKey[], const SystemValue[]) {
@@ -283,7 +283,7 @@ NyDMS SystemSetString(const File[], const SystemKey[], const SystemValue[]) {
 }
 
 stock NyDMS_GetString(const Filename[], const Key[]) {
-    if(!SystemCheckDefinedCommand(CheckDefinedCommand)) { return false; }
+    if(!SystemCheckDefinedCommand(CheckDefinedCommand)) { return true; }
     SystemGetString(Filename, Key);
     return 1;
 }
@@ -317,7 +317,7 @@ NyDMS SystemGetString(const File[], const SystemKey[]) {
 }
 
 stock NyDMS_SetInt(const Filename[], const SystemKey[], const Value) {
-    if(!SystemCheckDefinedCommand(CheckDefinedCommand)) { return false; }
+    if(!SystemCheckDefinedCommand(CheckDefinedCommand)) { return true; }
     return SystemSetInt(Filename, SystemKey, Value);
 }
 NyDMS SystemSetInt(const File[], const SystemKey[], const SystemValue) {
@@ -332,7 +332,7 @@ NyDMS SystemSetInt(const File[], const SystemKey[], const SystemValue) {
 }
 
 stock NyDMS_GetInt(const Filename[], const Key[]) {
-    if(!SystemCheckDefinedCommand(CheckDefinedCommand)) { return false; }
+    if(!SystemCheckDefinedCommand(CheckDefinedCommand)) { return true; }
     return SystemGetInt(Filename, Key);
 }
 NyDMS SystemGetInt(const File[], const SystemKey[]) {
@@ -345,7 +345,7 @@ NyDMS SystemGetInt(const File[], const SystemKey[]) {
 }
 
 stock NyDMS_SetFloat(const Filename[], const Key[], Float:Value) {
-    if(!SystemCheckDefinedCommand(CheckDefinedCommand)) { return false; }
+    if(!SystemCheckDefinedCommand(CheckDefinedCommand)) { return true; }
     return SystemSetFloat(Filename, Key, Value);
 }
 NyDMS SystemSetFloat(const File[], const SystemKey[], Float:SystemValue) {
@@ -372,7 +372,7 @@ stock Float:NyDMS_GetFloat(const Filename[], const Key[]) {
 }
 
 stock NyDMS_SetBoolean(const Filename[], const Key[], bool:Value){
-    if(!SystemCheckDefinedCommand(CheckDefinedCommand)) { return false; }
+    if(!SystemCheckDefinedCommand(CheckDefinedCommand)) { return true; }
     return SystemSetBoolean(Filename, Key, Value);
 }
 NyDMS SystemSetBoolean(const File[], const SystemKey[], bool:SystemValue) {
@@ -390,7 +390,7 @@ NyDMS SystemSetBoolean(const File[], const SystemKey[], bool:SystemValue) {
 }
 
 stock NyDMS_GetBoolean(const Filename[], const Key[]) {
-    if(!SystemCheckDefinedCommand(CheckDefinedCommand)) { return false; }
+    if(!SystemCheckDefinedCommand(CheckDefinedCommand)) { return true; }
     return SystemGetBoolean(Filename, Key);
 }
 NyDMS SystemGetBoolean(const File[], const SystemKey[]) {
@@ -403,7 +403,7 @@ NyDMS SystemGetBoolean(const File[], const SystemKey[]) {
 }
 
 stock NyDMS_IsSet(const Filename[], const Key[]) {
-    if(!SystemCheckDefinedCommand(CheckDefinedCommand)) { return false; }
+    if(!SystemCheckDefinedCommand(CheckDefinedCommand)) { return true; }
     return SystemIsSet(Filename, Key);
 }
 NyDMS SystemIsSet(const File[], const SystemKey[]) {
@@ -434,7 +434,7 @@ NyDMS SystemIsSet(const File[], const SystemKey[]) {
 }
 
 stock NyDMS_UnSet(const Filename[], const Key[]) {
-    if(!SystemCheckDefinedCommand(CheckDefinedCommand)) { return false; }
+    if(!SystemCheckDefinedCommand(CheckDefinedCommand)) { return true; }
     return SystemUnSet(Filename, Key);
 }
 NyDMS SystemUnSet(const File[], const SystemKey[]) {
@@ -487,7 +487,7 @@ NyDMS SystemUnSet(const File[], const SystemKey[]) {
 
 
 stock NyDMS_CreateLog(const Filename[]) {
-    if(!SystemCheckDefinedCommand(CheckDefinedCommand)) { return false; }
+    if(!SystemCheckDefinedCommand(CheckDefinedCommand)) { return true; }
     return SystemCreateLog(Filename);
 }
 NyDMS SystemCreateLog(const File[]) {
@@ -502,7 +502,7 @@ NyDMS SystemCreateLog(const File[]) {
 }
 
 stock NyDMS_WriteLog(const Filename[], const StringLog[]) {
-    if(!SystemCheckDefinedCommand(CheckDefinedCommand)) { return false; }
+    if(!SystemCheckDefinedCommand(CheckDefinedCommand)) { return true; }
     return SystemWriteLog(Filename, StringLog);
 }
 NyDMS SystemWriteLog(const File[], const SystemStringLog[]) {
@@ -524,7 +524,7 @@ NyDMS SystemWriteLog(const File[], const SystemStringLog[]) {
 }
 
 stock NyDMS_DeleteLog(const Filename[]) {
-    if(!SystemCheckDefinedCommand(CheckDefinedCommand)) { return false; }
+    if(!SystemCheckDefinedCommand(CheckDefinedCommand)) { return true; }
     return SystemDeleteLog(Filename);
 }
 NyDMS SystemDeleteLog(const File[]) {
@@ -537,7 +537,7 @@ NyDMS SystemDeleteLog(const File[]) {
 }
 
 stock NyDMS_FolderExists(const Folder[]) {
-    if(!SystemCheckDefinedCommand(CheckDefinedCommand)) { return false; }
+    if(!SystemCheckDefinedCommand(CheckDefinedCommand)) { return true; }
     return SystemFolderExists(Folder);
 }
 NyDMS SystemFolderExists(const SystemFolder[]) {
@@ -555,7 +555,7 @@ NyDMS SystemFolderExists(const SystemFolder[]) {
 }
 
 stock NyDMS_CheckLog(const Filename[]) {
-    if(!SystemCheckDefinedCommand(CheckDefinedCommand)) { return false; }
+    if(!SystemCheckDefinedCommand(CheckDefinedCommand)) { return true; }
     return SystemCheckLog(Filename);
 }
 NyDMS SystemCheckLog(const File[]) {
