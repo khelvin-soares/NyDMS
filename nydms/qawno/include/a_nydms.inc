@@ -42,7 +42,7 @@ O nome "NyDMS" é uma fusão entre o pseudônimo do autor, *Nyvlehk*, e a sigla 
 - `NyDMS_SetBoolean(const Filename[], const Key[], bool:Value);` – Define um valor booleano.
 - `NyDMS_GetBoolean(const Filename[], const Key[]);` – Obtém um valor booleano.
 - `NyDMS_IsSet(const Filename[], const Key[]);` – Verifica se uma chave está definida.
-- `NyDMS_Unset(const Filename[], const Key[]);` – Remove a chave e seu valor associado de um arquivo.
+- `NyDMS_UnSet(const Filename[], const Key[]);` – Remove a chave e seu valor associado de um arquivo.
 
 🔹 Manipulação de Logs:
 - `NyDMS_CreateLog(const Filename[]);` – Cria um arquivo de log.
@@ -81,7 +81,7 @@ Te vejo por lá! 📱✨
 
 | - +=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+ - |
 
-               NyDMS 1.0.1
+               NyDMS 2.0.0
 © Copyright 2025 by Kelvin (Nyvlehk) Soares.
 
 @author    : Nyvlehk (https://khelvinzito.vercel.app/)
@@ -92,6 +92,9 @@ Khelvinzito e Nyvlehk sao a mesma pessoas! So pra deixar claro.
 
 */
 
+new bool:CheckDefinedCommand = false;
+new NyDMS_String[3000];
+
 #if defined _nydms_included
   #endinput
 #endif
@@ -99,20 +102,22 @@ Khelvinzito e Nyvlehk sao a mesma pessoas! So pra deixar claro.
 #define _nydms_included
 #pragma library nydms
 
-#if defined MAX_STRING
-    #define NyDMS_MAX_STRING MAX_STRING
-#else
-    #define NyDMS_MAX_STRING 255
-#endif
+#define NYDMS_MAX_STRING            (255)
 
 #if !defined NyDMS
 	#define NyDMS static stock
 #endif
 
-new NyDMS_String[3000];
 #define SystemConsoleFormatted(%0,%1); format(NyDMS_String, sizeof(NyDMS_String), %0,%1); SystemConsole(NyDMS_String);
 
+#define NyDMS_SetBool			NyDMS_SetBoolean
+#define NyDMS_GetBool			NyDMS_SetGoolean
+
 // Estrutura adaptada para uso com a biblioteca dini.
+#if !defined _dini_included
+    #define _dini_included
+#endif
+
 #define dini_Exists		        NyDMS_FileExists
 #define dini_Remove         	NyDMS_RemoveFile
 #define dini_Create         	NyDMS_CreateFile
@@ -126,10 +131,6 @@ new NyDMS_String[3000];
 #define dini_Float      		NyDMS_GetFloat
 #define dini_Isset       		NyDMS_IsSet
 #define dini_Unset       		NyDMS_Unset
-
-#if !defined _dini_included
-    #define _dini_included
-#endif
 
 // Estrutura adaptada para uso com a biblioteca DOF2.
 #define DOF2_FileExists		        NyDMS_FileExists
@@ -150,10 +151,9 @@ new NyDMS_String[3000];
 	#define _dof2_included
 #endif
 
-new bool:CheckDefinedCommand = false;
+forward NyDMS_Start();
 
-#define function%0(%1)	forward %0(%1); public %0(%1)
-function NyDMS_Start() {
+public NyDMS_Start() {
     printf("\n\n");
     printf("NNNNN    NNN     YYYYY   YYYYYY     DDDDDDDDDDD     MMMMM     MMMMM     SSSSSSSSSSS");
     printf("NNNNNN   NNN      YYYYY  YYYYY      DDD      DDD    MMMMMM   MMMMMM    SSS");
@@ -165,406 +165,301 @@ function NyDMS_Start() {
     printf("| +=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+ |");
     printf("                                           ");
     printf("                  Nyvlehk                  ");
-    printf("               Version 1.0.1               ");
+    printf("               Version 2.0.0               ");
     printf("                01/Jul/2025                ");
     printf("      https://khelvinzito.vercel.app/      ");
     printf("  Thank you for choosing to use NyDMS. :)  ");
     printf("     (c) 2025 Kelvin (Nyvlehk) Soares.     ");
     printf("                                           ");
     printf("| +=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+ |\n");
-    CheckDefinedCommand = true;
-    SystemCheckDirectory();
+	CheckDefinedCommand = true;
+	SystemCheckDirectory();
     SystemCheckLogExists();
     return 1;
 }
 
-stock NyDMS_CreateFile(const Filename[]) {
-    if(!SystemCheckDefinedCommand(CheckDefinedCommand)) { return true; }
-    return SystemCreateFile(Filename);
+stock NyDMS_FileExists(const Filename[]) {
+	if(!SystemCheckDefinedCommand(CheckDefinedCommand) == true)
+		return 1;
+    return SystemFileExists(Filename);
 }
-NyDMS SystemCreateFile(const File[]) {
-	if(fexist(File)) {
-        SystemConsoleFormatted("[NyDMS ERROR]: Criacao do arquivo '%s' falhou - arquivo ja existente.", File);
-        return 1;
-    } else if(!fexist(File)) {
-        new File:Archive = fopen(File, io_write);
-        if(Archive) {
-            fclose(Archive);
-            return 1;
-        }
-    }
-	return 1;
+NyDMS SystemFileExists(const Filename[]) {
+    return fexist(Filename);
 }
 
 stock NyDMS_RemoveFile(const Filename[]) {
-    if(!SystemCheckDefinedCommand(CheckDefinedCommand)) { return true; }
     return SystemRemoveFile(Filename);
 }
-NyDMS SystemRemoveFile(const File[]) {
-    return fremove(File);
+NyDMS SystemRemoveFile(const Filename[]) {
+    return fremove(Filename);
 }
 
-stock NyDMS_FileExists(const Filename[]) {
-    if(!SystemCheckDefinedCommand(CheckDefinedCommand)) { return true; }
-    return SystemFileExists(Filename);
+stock NyDMS_CreateFile(const Filename[]) {
+	return SystemCreateFile(Filename);
 }
-NyDMS SystemFileExists(const File[]) {
-    return fexist(File);
+NyDMS SystemCreateFile(const Filename[]) {
+	if(fexist(Filename))    
+        return false;
+
+	new File:FileHandle;
+	FileHandle = fopen(Filename, io_write);
+	if(FileHandle) {
+		fclose(FileHandle);
+		return true;
+	}
+	return false;
 }
-
-
 
 stock NyDMS_SetString(const Filename[], const Key[], const Value[]) {
-    if(!SystemCheckDefinedCommand(CheckDefinedCommand)) { return true; }
-    return SystemSetString(Filename, Key, Value);
+	return SystemSetString(Filename, Key, Value);
 }
-NyDMS SystemSetString(const File[], const SystemKey[], const SystemValue[]) {
-    if(!fexist(File)) {
-        SystemConsoleFormatted("[NyDMS ERROR]: Falha ao localizar arquivo. O arquivo '%s' nao foi encontrado ou nao existe. Utilize NyDMS_CreateFile(\"Filename\"); para cria-lo.", File);
-        return 1;
-    }
+NyDMS SystemSetString(const Filename[], const Key[], const Value[]) {
+	new File:FileHandle, File:FileWriteHandle;
+	new bool:Wasset = false;
+	new TempResult[NYDMS_MAX_STRING];
 
-	new Key_Length = strlen(SystemKey);
-	new Value_Length = strlen(SystemValue);
-    new Sum = Key_Length + Value_Length + 2;
-
-	if(Key_Length == 0 || Sum > NyDMS_MAX_STRING) {
-        if(Key_Length == 0) {
-            SystemConsole("[NyDMS ERROR]: A Key fornecida na funcao 'NyDMS_SetString' esta vazia. Defina uma Key valida com valor maior que zero.");
-        }
-        if(Sum > NyDMS_MAX_STRING) {
-            SystemConsole("[NyDMS ERROR]: O valor definido na função 'NyDMS_SetString' excede o tamanho máximo permitido para a string.");
-        }
-        return 1;
-    }
-	
-	new File:SourceFile, File:SourceFileCopy;
-	new TempResult[NyDMS_MAX_STRING];
-	new bool:Replace = false;
-	
-	format(TempResult ,sizeof(TempResult), "%s.part", File);
-	fremove(TempResult);
-	
-	SourceFile = fopen(File, io_read);
-	if(!SourceFile)
+	if(Key[0] == 0)
         return false;
-	
-	SourceFileCopy = fopen(TempResult, io_write);
-	if(!SourceFileCopy) {
-		fclose(SourceFile);
-		return false;
-	}
-	
-	while(fread(SourceFile, TempResult)) {
-		if(!Replace && TempResult[Key_Length] == '=' && !strcmp(TempResult, SystemKey, true, Key_Length)) {
-			format(TempResult, sizeof(TempResult), "%s=%s", SystemKey, SystemValue);
-			Replace = true;
-		} else {
-			SystemRemoveNewLine(TempResult);
+
+	format(TempResult, sizeof(TempResult), "%s.part", Filename);
+	FileHandle = fopen(Filename, io_read);
+	if(!FileHandle)
+        return false;
+
+	fremove(TempResult);
+	FileWriteHandle = fopen(TempResult, io_write);
+	while(fread(FileHandle, TempResult)) {
+		SystemRemoveNewLine(TempResult);
+		if((!Wasset) && (SystemIsWitch(SystemExtractPrivateKey(TempResult), Key, true))) {
+			format(TempResult, sizeof(TempResult), "%s=%s", Key, Value);
+			Wasset = true;
 		}
-		fwrite(SourceFileCopy, TempResult);
-		fwrite(SourceFileCopy, "\r\n");
+		fwrite(FileWriteHandle, TempResult);
+		fwrite(FileWriteHandle, "\r\n");
 	}
 
-	if(!Replace) {
-		format(TempResult, sizeof(TempResult), "%s=%s", SystemKey, SystemValue);
-		fwrite(SourceFileCopy, TempResult);
-		fwrite(SourceFileCopy,"\r\n");
+	if (!Wasset) {
+		format(TempResult, sizeof(TempResult), "%s=%s", Key, Value);
+		fwrite(FileWriteHandle, TempResult);
+		fwrite(FileWriteHandle, "\r\n");
 	}
 
-	fclose(SourceFile);
-	fclose(SourceFileCopy);
+	fclose(FileHandle);
+	fclose(FileWriteHandle);
 
-	format(TempResult, sizeof(TempResult), "%s.part", File);
-	if(SystemCopyDataFile(TempResult, File)) {
+	format(TempResult, sizeof(TempResult), "%s.part", Filename);
+	if(SystemCopyTextFile(TempResult, Filename)) {
 		return fremove(TempResult);
 	}
-	return 1;
+	return false;
 }
 
 stock NyDMS_GetString(const Filename[], const Key[]) {
-    if(!SystemCheckDefinedCommand(CheckDefinedCommand)) { return true; }
-    SystemGetString(Filename, Key);
-    return 1;
+	SystemGetString(Filename, Key);
+	return 1;
 }
-NyDMS SystemGetString(const File[], const SystemKey[]) {
-    new Key_Length = strlen(SystemKey);
-    new TempResult[NyDMS_MAX_STRING];
-    new Sum = Key_Length + 2;
+NyDMS SystemGetString(const Filename[], const Key[]) {
+	new File:FileHandle;
+	new TempResult[NYDMS_MAX_STRING];
+	new TempResult2[NYDMS_MAX_STRING];
 
-    if(!fexist(File)) {
-        SystemConsoleFormatted("[NyDMS ERROR]: Falha ao localizar arquivo. O arquivo '%s' nao foi encontrado ou nao existe. Utilize NyDMS_CreateFile(\"Filename\"); para cria-lo.", File);
-    } else if(fexist(File)){
-        if(Key_Length == 0 || Sum > NyDMS_MAX_STRING)
-            return TempResult;
-        
-        new File:SourceFile;
-        SourceFile = fopen(File, io_read);
-        if(!SourceFile)
-            return TempResult;
-        
-        while(fread(SourceFile, TempResult)) {
-            if(TempResult[Key_Length] == '=' && !strcmp(TempResult, SystemKey, true, Key_Length)) {
-                SystemRemoveNewLine(TempResult);
-                strmid(TempResult, TempResult, Key_Length + 1, strlen(TempResult), NyDMS_MAX_STRING);
-                fclose(SourceFile);
-                return TempResult;
-            }
-        }
-        fclose(SourceFile);
-    }
-    return TempResult;
+	TempResult[0] = 0;
+	FileHandle = fopen(Filename, io_read);
+	if(!FileHandle)
+        return TempResult;
+
+	while(fread(FileHandle, TempResult)) {
+		SystemRemoveNewLine(TempResult);
+		if(SystemIsWitch(SystemExtractPrivateKey(TempResult), Key, true)) {
+			TempResult2[0] = 0;
+			strcat(TempResult2, SystemExtractPrivateValue(TempResult));
+			fclose(FileHandle);
+			return TempResult2;
+		}
+	}
+	fclose(FileHandle);
+	return TempResult;
 }
 
-stock NyDMS_SetInt(const Filename[], const SystemKey[], const Value) {
-    if(!SystemCheckDefinedCommand(CheckDefinedCommand)) { return true; }
-    return SystemSetInt(Filename, SystemKey, Value);
+stock NyDMS_SetInt(const Filename[], const Key[], Value) {
+	return SystemSetInt(Filename, Key, Value);
 }
-NyDMS SystemSetInt(const File[], const SystemKey[], const SystemValue) {
-    if(!fexist(File)) {
-        SystemConsoleFormatted("[NyDMS ERROR]: Falha ao localizar arquivo. O arquivo '%s' nao foi encontrado ou nao existe. Utilize NyDMS_CreateFile(\"Filename\"); para cria-lo.", File);
-        return 1;
-    }
-
-    new NyDMS_ValueStr[NyDMS_MAX_STRING];
-    format(NyDMS_ValueStr, NyDMS_MAX_STRING, "%d", SystemValue);
-    return SystemSetString(File, SystemKey, NyDMS_ValueStr);
+NyDMS SystemSetInt(const Filename[], const Key[], Value) {
+	new ValueString[NYDMS_MAX_STRING];
+	format(ValueString, sizeof(ValueString), "%d", Value);
+	return SystemSetString(Filename, Key, ValueString);
 }
 
 stock NyDMS_GetInt(const Filename[], const Key[]) {
-    if(!SystemCheckDefinedCommand(CheckDefinedCommand)) { return true; }
-    return SystemGetInt(Filename, Key);
+   	return SystemGetInt(Filename, Key);
 }
-NyDMS SystemGetInt(const File[], const SystemKey[]) {
-    if(!fexist(File)) {
-        SystemConsoleFormatted("[NyDMS ERROR]: Falha ao localizar arquivo. O arquivo '%s' nao foi encontrado ou nao existe. Utilize NyDMS_CreateFile(\"Filename\"); para cria-lo.", File);
-        return 1;
-    }
-
-    return strval(SystemGetString(File, SystemKey));
+NyDMS SystemGetInt(const Filename[], const Key[]) {
+   	return strval(SystemGetString(Filename, Key));
 }
 
-stock NyDMS_SetFloat(const Filename[], const Key[], Float:Value) {
-    if(!SystemCheckDefinedCommand(CheckDefinedCommand)) { return true; }
-    return SystemSetFloat(Filename, Key, Value);
+NyDMS Float:SystemSetFloat(const Filename[], const Key[], Float:Value) {
+	new ValueString[NYDMS_MAX_STRING];
+	format(ValueString, sizeof(ValueString), "%f", Value);
+	return SystemSetString(Filename, Key, ValueString);
 }
-NyDMS SystemSetFloat(const File[], const SystemKey[], Float:SystemValue) {
-    if(!fexist(File)) {
-        SystemConsoleFormatted("[NyDMS ERROR]: Falha ao localizar arquivo. O arquivo '%s' nao foi encontrado ou nao existe. Utilize NyDMS_CreateFile(\"Filename\"); para cria-lo.", File);
-        return 1;
-    }
-
-    new NyDMS_ValueStr[NyDMS_MAX_STRING];
-    format(NyDMS_ValueStr, NyDMS_MAX_STRING, "%f", SystemValue);
-    return SystemSetString(File, SystemKey, NyDMS_ValueStr);
+stock Float:NyDMS_SetFloat(const Filename[], const Key[], Float:Value) {
+	return SystemSetFloat(Filename, Key, Value);
 }
 
-NyDMS Float:SystemGetFloat(const File[], const SystemKey[]) {
-    if(!fexist(File)) {
-        SystemConsoleFormatted("[NyDMS ERROR]: Falha ao localizar arquivo. O arquivo '%s' nao foi encontrado ou nao existe. Utilize NyDMS_CreateFile(\"Filename\"); para cria-lo.", File);
-        return 1;
-    }
-    return floatstr(SystemGetString(File, SystemKey));
+NyDMS Float:SystemGetFloat(const Filename[], const Key[]) {
+	return floatstr(SystemGetString(Filename, Key));
 }
 stock Float:NyDMS_GetFloat(const Filename[], const Key[]) {
-    if(!SystemCheckDefinedCommand(CheckDefinedCommand)) { return 0; }
-    return SystemGetFloat(Filename, Key);
+	return SystemGetFloat(Filename, Key);
 }
 
-stock NyDMS_SetBoolean(const Filename[], const Key[], bool:Value){
-    if(!SystemCheckDefinedCommand(CheckDefinedCommand)) { return true; }
-    return SystemSetBoolean(Filename, Key, Value);
+NyDMS bool:SystemSetBoolean(const Filename[], const Key[], bool:Value) {
+	new FormatValue = 0;
+	if(Value == true) {
+		FormatValue = 1;
+	} else if(Value == false) {
+		FormatValue = 0;
+	} else {
+		SystemConsoleFormatted("[NyDMS INFO]: Algo deu errado! O valor definido nao existe, use apenas 'true' ou 'false'.");
+	}
+
+   	new ValueString[NYDMS_MAX_STRING];
+   	format(ValueString, sizeof(ValueString), "%d", FormatValue);
+	SystemSetString(Filename, Key, ValueString);
+   	return true;
 }
-NyDMS SystemSetBoolean(const File[], const SystemKey[], bool:SystemValue) {
-    if(!fexist(File)) {
-        SystemConsoleFormatted("[NyDMS ERROR]: Falha ao localizar arquivo. O arquivo '%s' nao foi encontrado ou nao existe. Utilize NyDMS_CreateFile(\"Filename\"); para cria-lo.", File);
-        return 1;
-    }
-
-	if(SystemValue == true)
-		return SystemSetString(File, SystemKey, "1");
-    if(SystemValue == false)
-	    return SystemSetString(File, SystemKey, "0");
-
-    return SystemValue;
+stock bool:NyDMS_SetBoolean(const Filename[], const Key[], bool:Value) {
+   	return SystemSetBoolean(Filename, Key, Value);
 }
 
-stock NyDMS_GetBoolean(const Filename[], const Key[]) {
-    if(!SystemCheckDefinedCommand(CheckDefinedCommand)) { return true; }
-    return SystemGetBoolean(Filename, Key);
+NyDMS bool:SystemGetBoolean(const Filename[], const Key[]) {
+	new bool:StringBool = false;
+	if(strval(SystemGetString(Filename, Key)) == 1) {
+		StringBool = true;
+	} else {
+		StringBool = false;
+	}
+   	return StringBool;
 }
-NyDMS SystemGetBoolean(const File[], const SystemKey[]) {
-    if(!fexist(File)) {
-        SystemConsoleFormatted("[NyDMS ERROR]: Falha ao localizar arquivo. O arquivo '%s' nao foi encontrado ou nao existe. Utilize NyDMS_CreateFile(\"Filename\"); para cria-lo.", File);
-        return 1;
-    }
-
-    return strval(SystemGetString(File, SystemKey));
+stock bool:NyDMS_GetBoolean(const Filename[], const Key[]) {
+	return SystemGetBoolean(Filename, Key);
 }
 
 stock NyDMS_IsSet(const Filename[], const Key[]) {
-    if(!SystemCheckDefinedCommand(CheckDefinedCommand)) { return true; }
-    return SystemIsSet(Filename, Key);
+	return SystemIsSet(Filename, Key);
 }
-NyDMS SystemIsSet(const File[], const SystemKey[]) {
-    if(!fexist(File)) {
-        SystemConsoleFormatted("[NyDMS ERROR]: Falha ao localizar arquivo. O arquivo '%s' nao foi encontrado ou nao existe. Utilize NyDMS_CreateFile(\"Filename\"); para cria-lo.", File);
-        return 1;
-    }
+NyDMS SystemIsSet(const Filename[], const Key[]) {
+	new File:FileHandle;
+	new TempResult[NYDMS_MAX_STRING];
+	FileHandle = fopen(Filename, io_read);
 
-	new Key_Length = strlen(SystemKey);
-    new Sum = Key_Length + 2;
-	if (Key_Length == 0 || Sum > NyDMS_MAX_STRING)
-        return false;
-	
-	new File:SourceFile;
-	SourceFile = fopen(File, io_read);
-	if(!SourceFile)
-        return false;
-	
-	new TempResult[NyDMS_MAX_STRING];
-	while(fread(SourceFile, TempResult)) {
-		if(TempResult[Key_Length] == '=' && !strcmp(TempResult, SystemKey, true, Key_Length)) {
-			fclose(SourceFile);
+	if(!FileHandle)
+		return false;
+
+	while(fread(FileHandle, TempResult)) {
+		SystemRemoveNewLine(TempResult);
+		if(SystemIsWitch(SystemExtractPrivateKey(TempResult), Key, true)) {
+			fclose(FileHandle);
 			return true;
 		}
 	}
-	fclose(SourceFile);
+	fclose(FileHandle);
 	return false;
 }
 
 stock NyDMS_UnSet(const Filename[], const Key[]) {
-    if(!SystemCheckDefinedCommand(CheckDefinedCommand)) { return true; }
-    return SystemUnSet(Filename, Key);
+	return SystemUnSet(Filename, Key);
 }
-NyDMS SystemUnSet(const File[], const SystemKey[]) {
-    if(!fexist(File)) {
-        SystemConsoleFormatted("[NyDMS ERROR]: Falha ao localizar arquivo. O arquivo '%s' nao foi encontrado ou nao existe. Utilize NyDMS_CreateFile(\"Filename\"); para cria-lo.", File);
-        return 1;
-    }
-    
-	new Key_Length = strlen(SystemKey);
-    new Sum = Key_Length + 2;
-	if (Key_Length == 0 || Sum > NyDMS_MAX_STRING)
-        return false;
-	
-	new File:SourceFile, File:SourceFileCopy;
-	new TempResult[NyDMS_MAX_STRING];
-	
-	format(TempResult, NyDMS_MAX_STRING, "%s.part", File);
-	fremove(TempResult);
-	
-	SourceFile = fopen(File, io_read);
-	if(!SourceFile)
-        return false;
-	
-	SourceFileCopy = fopen(TempResult, io_write);
-	if(!SourceFileCopy) {
-		fclose(SourceFile);
+NyDMS SystemUnSet(const Filename[], const Key[]) {
+	new TempResult[NYDMS_MAX_STRING];
+	new File:FileHandle, File:FileWriteHandle;
+	format(TempResult, sizeof(TempResult), "%s.part", Filename);
+	FileHandle = fopen(Filename, io_read);
+
+	if(!FileHandle)
 		return false;
-	}
-	
-	while(fread(SourceFile, TempResult)) {
-		if(TempResult[Key_Length] == '=' && !strcmp(TempResult, SystemKey, true, Key_Length)) {
-			// You don't need anything here! We've already taken what needs to be removed.
+
+	fremove(TempResult);
+	FileWriteHandle = fopen(TempResult, io_write);
+	while(fread(FileHandle,TempResult)) {
+		SystemRemoveNewLine(TempResult);
+		if(SystemIsWitch(SystemExtractPrivateKey(TempResult), Key, true)) {
 		} else {
-			SystemRemoveNewLine(TempResult);
-			fwrite(SourceFileCopy, TempResult);
-			fwrite(SourceFileCopy,"\r\n");
+			format(TempResult, sizeof(TempResult), "%s", TempResult);
+			fwrite(FileWriteHandle, TempResult);
+			fwrite(FileWriteHandle, "\r\n");
 		}
 	}
-	
-	fclose(SourceFile);
-	fclose(SourceFileCopy);
 
-	format(TempResult, NyDMS_MAX_STRING, "%s.part", File);
-	if(SystemCopyDataFile(TempResult, File)) {
+	fclose(FileHandle);
+	fclose(FileWriteHandle);
+
+	format(TempResult, sizeof(TempResult), "%s.part", Filename);
+	if(SystemCopyTextFile(TempResult, Filename)) {
 		return fremove(TempResult);
 	}
 	return false;
 }
 
-
-
 stock NyDMS_CreateLog(const Filename[]) {
-    if(!SystemCheckDefinedCommand(CheckDefinedCommand)) { return true; }
     return SystemCreateLog(Filename);
 }
-NyDMS SystemCreateLog(const File[]) {
-    if(fexist(File)) {
-        SystemConsoleFormatted("[NyDMS ERROR]: Nao foi possivel criar o log '%s' - ele ja existe. Use NyDMS_WriteLog(\"Filename\", \"Message\"); para registrar informacoes.", File);
-        return 1;
-    }
-
-    new File:archive = fopen(File, io_write);
+NyDMS SystemCreateLog(const Filename[]) {
+    new File:archive = fopen(Filename, io_write);
     fclose(archive);
     return 1;
 }
 
 stock NyDMS_WriteLog(const Filename[], const StringLog[]) {
-    if(!SystemCheckDefinedCommand(CheckDefinedCommand)) { return true; }
     return SystemWriteLog(Filename, StringLog);
 }
-NyDMS SystemWriteLog(const File[], const SystemStringLog[]) {
+NyDMS SystemWriteLog(const Filename[], const StringLog[]) {
     new StrLog[3000];
     new LogYear, LogMonth, LogDay;
 	new LogHour, LogMinute, LogSecond;
-    if(!fexist(File)) {
-        SystemConsoleFormatted("[NyDMS ERROR]: Falha na escrita. O log '%s' nao foi encontrado ou nao existe. Utilize NyDMS_CreateLog(\"Filename\"); para cria-lo.", File);
-        return 0;
-    }
-    getdate(LogYear, LogMonth, LogDay);
+	getdate(LogYear, LogMonth, LogDay);
     gettime(LogHour, LogMinute, LogSecond);
-    format(StrLog, sizeof(StrLog), "(%02d/%02d/%d) - [%02d:%02d:%02d] > %s\r\n", LogDay, LogMonth, LogYear, LogHour, LogMinute, LogSecond, SystemStringLog);
+    format(StrLog, sizeof(StrLog), "(%02d/%02d/%d) - [%02d:%02d:%02d] > %s\r\n", LogDay, LogMonth, LogYear, LogHour, LogMinute, LogSecond, StringLog);
 
-    new File:archive = fopen(File, io_append);
-    fwrite(archive, StrLog);
-    fclose(archive);
+    new File:Archive = fopen(Filename, io_append);
+    fwrite(Archive, StrLog);
+    fclose(Archive);
     return 1;
 }
 
 stock NyDMS_DeleteLog(const Filename[]) {
-    if(!SystemCheckDefinedCommand(CheckDefinedCommand)) { return true; }
     return SystemDeleteLog(Filename);
 }
-NyDMS SystemDeleteLog(const File[]) {
-    if(!fexist(File)) {
-        SystemConsoleFormatted("[NyDMS ERROR]: Log '%s' nao encontrado ou nao existe. Utilize NyDMS_CreateLog(\"Filename\"); para gerar o arquivo.", File);
-        return 0;
-    }
-    fremove(File);
-    return 1;
+NyDMS SystemDeleteLog(const Filename[]) {
+    return fremove(Filename);
 }
 
 stock NyDMS_FolderExists(const Folder[]) {
-    if(!SystemCheckDefinedCommand(CheckDefinedCommand)) { return true; }
-    return SystemFolderExists(Folder);
+	return SystemFolderExists(Folder);
 }
-NyDMS SystemFolderExists(const SystemFolder[]) {
+NyDMS SystemFolderExists(const Folder[]) {
     new NyDMS_LocalStr[500];
-	format(NyDMS_LocalStr, sizeof(NyDMS_LocalStr), "%s/checking.log", SystemFolder);
-	SystemCreateFile(NyDMS_LocalStr);
+	format(NyDMS_LocalStr, sizeof(NyDMS_LocalStr), "%s/checking.log", Folder);
+	NyDMS_CreateFile(NyDMS_LocalStr);
 	if(fexist(NyDMS_LocalStr)) {
-	    printf("[NyDMS INFO]: A pasta '%s' foi encontrada e carregado com sucesso.", SystemFolder);
+	    printf("[NyDMS INFO]: A pasta '%s' foi encontrada e carregado com sucesso.", Folder);
 	} else if(!fexist(NyDMS_LocalStr)) {
-        SystemConsoleFormatted("[NyDMS ERROR]: A pasta '%s' nao foi encontrada ou nao existe.", SystemFolder);
-	    printf("[NyDMS ERROR]: A pasta '%s' nao foi encontrada ou nao existe.", SystemFolder);
+	    printf("[NyDMS ERROR]: A pasta '%s' nao foi encontrada ou nao existe.", Folder);
+		SystemConsoleFormatted("[NyDMS ERROR]: A pasta '%s' nao foi encontrada ou nao existe.", Folder);
 	}
 	fremove(NyDMS_LocalStr);
 	return 1;
 }
 
 stock NyDMS_CheckLog(const Filename[]) {
-    if(!SystemCheckDefinedCommand(CheckDefinedCommand)) { return true; }
-    return SystemCheckLog(Filename);
+	return SystemCheckLog(Filename);
 }
-NyDMS SystemCheckLog(const File[]) {
-	if(fexist(File)) {
-	    printf("[NyDMS INFO]: O log '%s' foi encontrado e carregado com sucesso.", File);
-	    return 1;
-	} else if(!fexist(File)) {
-	    printf("[NyDMS ERROR]: O log '%s' nao foi encontrado ou nao existe.", File);
-	    return 1;
+NyDMS SystemCheckLog(const Filename[]) {
+	if(fexist(Filename)) {
+	    printf("[NyDMS INFO]: O log '%s' foi encontrado e carregado com sucesso.", Filename);
+	} else if(!fexist(Filename)) {
+	    printf("[NyDMS ERROR]: O log '%s' nao foi encontrado ou nao existe.", Filename);
+		SystemConsoleFormatted("[NyDMS ERROR]: O log '%s' nao foi encontrado ou nao existe.", Filename);
 	}
 	return 1;
 }
@@ -582,19 +477,111 @@ NyDMS SystemConsole(const ErrorMessage[]) {
     return 1;
 }
 
-NyDMS SystemCheckLogExists() {
-    new Path[200] = "NyDMS/SystemConsole.log";
-    if(!fexist(Path)) {
-        SystemCreateLog(Path);
-        printf("[NyDMS]: Log do sistema gerado e carregado corretamente.");
-        SystemConsole("[NyDMS ERROR]: O log do sistema nao foi encontrado. Um novo arquivo foi criado automaticamente.");
-    } else if(fexist(Path)) {
-        printf("[NyDMS]: Log do sistema carregado corretamente.");
-    } else {
-        SystemConsole("[NyDMS ERROR]: Falha ao criar ou carregar o log do sistema. Certifique-se de que a pasta 'NyDMS' existe dentro do diretorio 'scriptfiles'.");
-        SendRconCommand("exit");
+NyDMS SystemIsWitch(const Str1[], const Str2[], bool:Ignorecase) {
+    if(strlen(Str1) != strlen(Str2))
+        return false;
+    if(strcmp(Str1, Str2, Ignorecase) == 0)
+        return true;
+    return false;
+}
+
+NyDMS SystemStringCopy(Dest[], const Source[]) {
+	new Count = strlen(Source);
+
+	for(new i = 0; i < Count; i++) {
+		Dest[i] = Source[i];
+	}
+	Dest[Count] = 0;
+}
+
+NyDMS SystemRemoveNewLine(string[]) {
+	new len = strlen(string);
+
+	if(string[0] == 0)
+        return ;
+
+	if((string[len - 1] == '\n') || (string[len - 1] == '\r')) {
+		string[len - 1] = 0;
+		if(string[0] == 0)
+            return ;
+		if((string[len - 2] == '\n') || (string[len - 2] == '\r')) { string[len - 2] = 0; }
+	}
+}
+
+NyDMS SystemCopyTextFile(const Oldname[], const Newname[]) {
+	new File:FileHandle, File:FileWriteHandle;
+
+	if(!fexist(Oldname))
+        return false;
+
+	FileHandle = fopen(Oldname, io_read);
+	FileWriteHandle = fopen(Newname, io_write);
+
+	new tmpres[NYDMS_MAX_STRING];
+	while(fread(FileHandle, tmpres)) {
+		SystemRemoveNewLine(tmpres);
+		format(tmpres, sizeof(tmpres), "%s\r\n", tmpres);
+		fwrite(FileWriteHandle, tmpres);
+	}
+	fclose(FileHandle);
+	fclose(FileWriteHandle);
+	return true;
+}
+
+NyDMS SystemStringLowercase(const Text[]) {
+	new tmpres[NYDMS_MAX_STRING];
+
+	tmpres[0] = 0;
+	if(Text[0] == 0)
+        return tmpres;
+
+	for(new i = 0; i < strlen(Text); i++) {
+		tmpres[i] = tolower(Text[i]);
+	}
+	tmpres[strlen(Text)] = 0;
+	return tmpres;
+}
+
+NyDMS SystemExtractPrivateKey(const Line[]) {
+	new StrTempResult[NYDMS_MAX_STRING];
+
+	StrTempResult[0] = 0;
+	if(strfind(Line, "=", true) == -1)
+        return StrTempResult;
+
+	SystemStringCopy(StrTempResult, SystemStringLowercase(SystemReturnMemoryCopy(Line, 0, strfind(Line, "=", true))));
+	return StrTempResult;
+}
+
+NyDMS SystemExtractPrivateValue(const Line[]) {
+    new tmpres[NYDMS_MAX_STRING];
+
+    tmpres[0] = 0;
+    if(strfind(Line, "=", true) == -1) {
+        return tmpres;
     }
-    return 1;
+    
+    SystemStringCopy(tmpres, SystemReturnMemoryCopy(Line, strfind(Line, "=" , true) + 1, strlen(Line)));
+    return tmpres;
+}
+
+NyDMS SystemReturnMemoryCopy(const Source[], Index = 0, NumBytes) {
+	new tmpres[NYDMS_MAX_STRING];
+
+	tmpres[0] = 0;
+	if(Index >= strlen(Source))
+        return tmpres;
+
+	if(NumBytes + Index >= strlen(Source)) { NumBytes = strlen(Source) - Index; }
+	if(NumBytes <= 0)
+        return tmpres;
+	for(new i = Index; i < NumBytes + Index; i++) {
+		tmpres[i-Index] = Source[i];
+		if(Source[i] == 0)
+            return tmpres;
+	}
+	tmpres[NumBytes] = 0;
+	return tmpres;
 }
 
 NyDMS SystemCheckDirectory() {
@@ -615,46 +602,21 @@ NyDMS SystemCheckDirectory() {
 	return 1;
 }
 
-
-
-
-NyDMS SystemRemoveNewLine(NyDMS_Str[]) {
-	new len = strlen(NyDMS_Str);
-	if(NyDMS_Str[0] == 0)
-        return ;
-	if((NyDMS_Str[len - 1] == '\n') || (NyDMS_Str[len - 1] == '\r')) {
-		NyDMS_Str[len - 1] = 0;
-		if(NyDMS_Str[0]==0)
-            return ;
-		if((NyDMS_Str[len - 2] == '\n') || (NyDMS_Str[len - 2] == '\r')) { NyDMS_Str[len - 2] = 0; }
-	}
+NyDMS SystemCheckLogExists() {
+    new Path[200] = "NyDMS/SystemConsole.log";
+    if(!fexist(Path)) {
+        SystemCreateLog(Path);
+        printf("[NyDMS]: Log do sistema gerado e carregado corretamente.");
+        SystemConsole("[NyDMS ERROR]: O log do sistema nao foi encontrado. Um novo arquivo foi criado automaticamente.");
+    } else if(fexist(Path)) {
+        printf("[NyDMS]: Log do sistema carregado corretamente.");
+    } else {
+        SystemConsole("[NyDMS ERROR]: Falha ao criar ou carregar o log do sistema. Certifique-se de que a pasta 'NyDMS' existe dentro do diretorio 'scriptfiles'.");
+        SendRconCommand("exit");
+    }
+    return 1;
 }
 
-NyDMS SystemCopyDataFile(const Oldname[], const Newname[]) {
-	new File:SourceFile, File:SourceFileCopy;
-	if(!fexist(Oldname))
-        return false;
-	SourceFile = fopen(Oldname, io_read);
-
-	if(!SourceFile)
-        return false;
-	SourceFileCopy = fopen(Newname, io_write);
-	if(!SourceFileCopy) {
-		fclose(SourceFile);
-		return false;
-	}
-
-	new TempResult[NyDMS_MAX_STRING];
-    while(fread(SourceFile, TempResult)) {
-		SystemRemoveNewLine(TempResult);
-		format(TempResult, sizeof(TempResult), "%s\r\n", TempResult);
-		fwrite(SourceFileCopy, TempResult);
-	}
-
-	fclose(SourceFile);
-	fclose(SourceFileCopy);
-	return true;
-}
 
 stock SystemCheckDefinedCommand(bool:Value) {
     if(Value == false) { 
