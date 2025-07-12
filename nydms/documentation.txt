@@ -79,7 +79,7 @@ Te vejo por lá! 📱✨
 
 | - +=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+ - |
 
-               NyDMS 1.0.0
+               NyDMS 2.0.0
 © Copyright 2025 by Kelvin (Nyvlehk) Soares.
 
 @author    : Nyvlehk (https://khelvinzito.vercel.app/)
