@@ -1,15 +1,5 @@
 # Include NyDMS
 
-NNNNN    NNN     YYYYY   YYYYYY     DDDDDDDDDDD     MMMMM     MMMMM     SSSSSSSSSSS
-NNNNNN   NNN      YYYYY  YYYYY      DDD      DDD    MMMMMM   MMMMMM    SSS
-NNN NNN  NNN       YYYYY YYYY       DDD       DDD   MMM MMM MMM MMM     SSSSS
-NNN NNN  NNN         YYYYYYY        DDD       DDD   MMM  MMMMM  MMM          SSSSSSS
-NNN  NNN NNN          YYYYY         DDD       DDD   MMM   MMM   MMM               SSS
-NNN   NNNNNN         YYYYY          DDD      DDD    MMM         MMM              SSS
-NNN    NNNNN        YYYYY           DDDDDDDDDDD     MMM         MMM     SSSSSSSSSSSS
-
----
-
 NyDMS é uma include desenvolvida para o SA-MP (San Andreas Multiplayer), com foco na manipulação estruturada e
 simplificada de dados armazenados em arquivos locais no formato `.ini`. Seu principal objetivo é oferecer uma
 solução leve, modular e de fácil integração, servindo como alternativa moderna a includes populares como
